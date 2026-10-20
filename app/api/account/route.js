@@ -1,0 +1,12 @@
+import {context} from '../../../lib/supabase.js';
+import {cleanState,seal,unseal} from '../../../lib/account-core.mjs';
+import {response,originGuard,body,failure} from '../../../lib/http.mjs';
+import {defaultCatalog} from '../../../lib/catalog.mjs';
+export const dynamic='force-dynamic';
+async function handler(r){try{originGuard(r);const {db,user}=await context();if(!user)return response({error:'authentication_required'},401);const {data:access,error:ae}=await db.rpc('fitverse_access');if(ae)throw Error();
+ if(r.method==='GET'){const {data:row,error}=await db.from('fitverse_accounts').select('payload,revision').eq('user_id',user.id).maybeSingle();if(error)throw Error();return response({state:row?await unseal(row.payload,process.env.FITVERSE_DATA_KEY,user.id):null,revision:row?.revision||0,account:{displayName:user.email},access});}
+ if(r.method==='PUT'){const v=await body(r);if(!Number.isSafeInteger(v.revision)||v.revision<0)return response({error:'invalid_revision'},400);const state=cleanState(v.state);if(state.plan){const {data:row,error:ce}=await db.from('fitverse_catalog').select('data').eq('id',1).maybeSingle();if(ce)throw Error();const c=row?.data||defaultCatalog();const program=c.programs.find(p=>p.enabled&&(p.id===v.state.plan.programId||(!v.state.plan.programId&&p.place===state.plan.place)));if(!program)return response({error:'program_unavailable'},400);if(program.paid&&!access.full)return response({error:'upgrade_required'},402);state.plan.programId=program.id;state.plan.days=access.full?state.plan.days:program.days;state.plan.sessions=Array.from({length:state.plan.days},(_,i)=>({day:1+i*2,ids:program.ids}));}const payload=await seal(state,process.env.FITVERSE_DATA_KEY,user.id);const {data,error}=await db.rpc('fitverse_save_account',{p_revision:v.revision,p_payload:payload});if(error){if(error.message.includes('revision_conflict'))return response({error:'revision_conflict'},409);if(error.message.includes('rate_limited'))return response({error:'rate_limited'},429);throw Error()}return response({revision:data});}
+ if(r.method==='DELETE'){const raw=r.headers.get('if-match');if(!raw||!/^\d+$/.test(raw))return response({error:'revision_required'},428);const {data,error}=await db.rpc('fitverse_delete_account',{p_revision:Number(raw)});if(error)throw Error();if(!data)return response({error:'revision_conflict'},409);return response({deleted:true});}
+ return response({error:'method_not_allowed'},405);
+ }catch(e){return failure(e)}}
+export const GET=handler,PUT=handler,DELETE=handler;

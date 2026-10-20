@@ -1,0 +1,1 @@
+const footer=document.createElement('footer');footer.dir='ltr';footer.style.cssText='text-align:center;padding:24px';footer.textContent=`© ${new Date().getFullYear()} Ahmed Morgan — All rights reserved / جميع الحقوق محفوظة`;document.body.append(footer);

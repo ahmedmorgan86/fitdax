@@ -1,0 +1,4 @@
+import {context} from '../../../lib/supabase.js';
+import {response,failure} from '../../../lib/http.mjs';
+export const dynamic='force-dynamic';
+export async function GET(){try{const {db,user}=await context();if(!user)return response({error:'authentication_required'},401);const {data:access,error}=await db.rpc('fitverse_access');if(error)throw Error();if(access.role!=='admin')return response({error:'admin_required'},403);const {data:audit,error:logError}=await db.from('fitverse_audit').select('action,revision,created_at').order('created_at',{ascending:false}).limit(20);if(logError)throw Error();return response({role:'admin',audit,payments:{enabled:false,provider:null,reason:'merchant_not_configured'},adminDataPrivacy:'No health records are exposed in this panel.'})}catch(e){return failure(e)}}

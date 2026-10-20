@@ -1,0 +1,23 @@
+import assert from 'node:assert/strict';
+import {randomBytes} from 'node:crypto';
+import {cleanState,seal,unseal} from './lib/account-core.mjs';
+import {defaultCatalog,validateCatalog} from './lib/catalog.mjs';
+import {originGuard,body} from './lib/http.mjs';
+import {fresh,makePlan,dateKey} from './public/fitverse/core.mjs';
+const p={name:'Synthetic QA',age:30,height:180,weight:80,sex:'male',activity:'low',goal:'maintain',diet:'all',risk:false,allergies:[]};const state={...fresh(),profile:p,plan:makePlan(p),consent:true,consentVersion:'2026-10-19',measurements:[{date:dateKey(),weight:80,waist:null}]};let count=0;
+async function test(name,fn){await fn();count++;console.log('PASS '+name)}
+await test('Explicit current consent and adult age required',()=>{for(const patch of [{consent:false},{consentVersion:'old'},{profile:{...p,age:17}},{profile:{...p,age:30.5}}])assert.throws(()=>cleanState({...state,...patch}))});
+await test('User-supplied role and payment claims stripped',()=>{const v=cleanState({...state,role:'admin',paid:true,profile:{...p,isAdmin:true}});assert(!('role'in v));assert(!('paid'in v));assert(!('isAdmin'in v.profile))});
+await test('Profile safety flag disables automatic plans',()=>assert.equal(cleanState({...state,profile:{...p,risk:true}}).plan,null));
+await test('Invalid dates, invalid intake and oversized history rejected',()=>{for(const patch of [{water:{'2026-02-31':250}},{water:{[dateKey()]:21000}},{intake:[{uid:'a',date:dateKey(),name:'x',k:-1,p:0,c:0,f:0}]},{sessions:Array(3001).fill({})}])assert.throws(()=>cleanState({...state,...patch}))});
+await test('Authenticated encryption is randomized and user-bound',async()=>{const key=randomBytes(32).toString('hex'),a=await seal(state,key,'a'),b=await seal(state,key,'a');assert.notEqual(a,b);assert(!a.includes(p.name));assert.deepEqual(await unseal(a,key,'a'),state);await assert.rejects(unseal(a,key,'b'));await assert.rejects(unseal(a,randomBytes(32).toString('hex'),'a'))});
+await test('Missing encryption keys fail closed',async()=>await assert.rejects(seal(state,null,'a')));
+await test('Default branding and prices match new product decisions',()=>{const c=validateCatalog(defaultCatalog());assert.equal(c.brand,'FitVerse');assert.equal(c.copyrightOwner,'Ahmed Morgan');assert.equal(c.plans[1].monthly,99);assert.equal(c.plans[1].annual,799);assert.equal(c.plans[2].available,false)});
+await test('Catalog rejects script markup and AI branding',()=>{for(const patch of [{brand:'FitVerse AI'},{brand:'<script>bad</script>'},{supportEmail:'bad'}])assert.throws(()=>validateCatalog({...defaultCatalog(),...patch}))});
+await test('Free prices cannot become paid or negative',()=>{for(const price of [-1,10]){const c=defaultCatalog();c.plans[0].monthly=price;assert.throws(()=>validateCatalog(c))}});
+await test('Programs must reference real exercises in their location',()=>{const c=defaultCatalog();c.programs[0].ids=['nonexistent'];assert.throws(()=>validateCatalog(c));const d=defaultCatalog();d.programs[0].ids=['legpress'];assert.throws(()=>validateCatalog(d))});
+await test('Negative meal macros and unknown allergens rejected',()=>{const c=defaultCatalog();c.food[0].p=-1;assert.throws(()=>validateCatalog(c));const d=defaultCatalog();d.food[0].allergens=['other'];assert.throws(()=>validateCatalog(d))});
+await test('Unreviewed exercise media cannot be injected through catalog',()=>{const c=defaultCatalog();c.exercises[0].media={image:'javascript:alert(1)',reviewed:true};const v=validateCatalog(c);assert.equal(v.exercises[0].media.image,null);assert.equal(v.exercises[0].media.reviewed,false)});
+await test('Cross-origin mutations rejected; same-origin allowed',()=>{assert.throws(()=>originGuard(new Request('https://app.test/api',{method:'PUT',headers:{origin:'https://evil.test'}})));originGuard(new Request('https://app.test/api',{method:'PUT',headers:{origin:'https://app.test'}}))});
+await test('Bounded JSON parser rejects oversized and malformed requests',async()=>{await assert.rejects(body(new Request('https://a.test',{method:'POST',headers:{'content-type':'application/json'},body:'x'.repeat(110)}),100));await assert.rejects(body(new Request('https://a.test',{method:'POST',headers:{'content-type':'application/json'},body:'bad'})));assert.deepEqual(await body(new Request('https://a.test',{method:'POST',headers:{'content-type':'application/json'},body:'{"ok":true}'})),{ok:true})});
+console.log(`${count} release security/content checks passed.`);
