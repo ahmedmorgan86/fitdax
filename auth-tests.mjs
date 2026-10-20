@@ -1,0 +1,14 @@
+import assert from 'node:assert/strict';
+import {authInput,authFailure} from './lib/auth-input.mjs';
+assert.throws(()=>authInput({action:'send',email:'qa@example.invalid'}));
+assert.throws(()=>authInput({action:'signup',email:'qa@example.invalid',password:'short',acceptedTerms:true}));
+assert.throws(()=>authInput({action:'signup',email:'qa@example.invalid',password:'long-synthetic-password'}));
+assert.deepEqual(authInput({action:'signup',email:' qa@example.invalid ',password:'long-synthetic-password',acceptedTerms:true,role:'admin'}),{action:'signup',email:'qa@example.invalid',password:'long-synthetic-password'});
+assert.deepEqual(authInput({action:'google',role:'admin'}),{action:'google'});
+assert.throws(()=>authInput({action:'login',email:'not-email',password:'a'}));
+assert.throws(()=>authInput({action:'update-password',password:'x'.repeat(129)}));
+assert.equal(authInput({action:'login',email:'qa@example.invalid',password:'  preserved  '}).password,'  preserved  ');
+assert.equal(authFailure({status:429}).status,429);
+assert.equal(authFailure({code:'email_not_confirmed'}).status,403);
+assert.equal(authFailure({code:'user_not_found'}).error,authFailure({code:'invalid_credentials'}).error);
+console.log('PASS auth action allowlist, password bounds, exact password preservation, terms gate, role stripping, confirmation and generic credential errors');
