@@ -1,0 +1,13 @@
+import {context} from '../../../lib/supabase.js';
+import {response,body,originGuard,failure} from '../../../lib/http.mjs';
+import {defaultCatalog} from '../../../lib/catalog.mjs';
+export const dynamic='force-dynamic';
+export async function GET(){try{const {db,user}=await context();if(!user)return response({error:'authentication_required'},401);const {data:access,error}=await db.rpc('fitverse_access');if(error)throw Error();const {data:row,error:ce}=await db.from('fitverse_catalog').select('data').eq('id',1).maybeSingle();if(ce)throw Error();const catalog={...defaultCatalog(),...(row?.data||{})};const {data:orders,error:oe}=await db.from('fitverse_payment_orders').select('id,user_id,plan,period,amount,method,destination,recipient_name,status,transfer_reference,created_at,reviewed_at').order('created_at',{ascending:false}).limit(100);if(oe)throw Error();return response({userId:user.id,access,plans:catalog.plans,payments:catalog.payments,orders})}catch(e){return failure(e)}}
+export async function POST(r){try{originGuard(r);const {db,user}=await context();if(!user)return response({error:'authentication_required'},401);const v=await body(r,4096);let args,name;
+ if(v.action==='create'){if(!['pro','premium'].includes(v.plan)||!['monthly','annual'].includes(v.period)||!['wallet','instapay'].includes(v.method))return response({error:'invalid_order'},400);name='fitverse_create_payment';args={p_plan:v.plan,p_period:v.period,p_method:v.method};}
+ else if(v.action==='submit'){if(typeof v.reference!=='string'||!/^[a-zA-Z0-9_-]{6,80}$/.test(v.reference))return response({error:'invalid_reference'},400);name='fitverse_submit_payment';args={p_id:v.id,p_reference:v.reference};}
+ else if(v.action==='review'){if(!['approve','reject'].includes(v.decision)||v.confirmed!==true)return response({error:'confirmation_required'},400);name='fitverse_review_payment';args={p_id:v.id,p_approve:v.decision==='approve'};}
+ else return response({error:'invalid_action'},400);
+ if(v.action!=='create'&&(typeof v.id!=='string'||! /^[a-f0-9-]{36}$/.test(v.id)))return response({error:'invalid_id'},400);
+ const {data,error}=await db.rpc(name,args);if(error){const code=error.message;return response({error:['admin_required','payment_unavailable','plan_unavailable','invalid_status','duplicate_reference','too_many_orders','invalid_reference','order_expired'].find(x=>code.includes(x))||'payment_request_failed'},400)}return response({result:data});}catch(e){return failure(e)}}
+
