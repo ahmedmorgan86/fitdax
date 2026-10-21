@@ -1,2 +1,2 @@
-const config={poweredByHeader:false,async headers(){return [{source:'/(.*)',headers:[{key:'X-Content-Type-Options',value:'nosniff'},{key:'Referrer-Policy',value:'same-origin'},{key:'X-Frame-Options',value:'DENY'},{key:'Permissions-Policy',value:'camera=(), microphone=(), geolocation=()'}]}]}};
+const config={poweredByHeader:false,async redirects(){return [{source:'/:path*',has:[{type:'host',value:'fitdax-app.vercel.app'}],destination:'https://fitdax.vercel.app/:path*',permanent:true}]},async headers(){return [{source:'/(.*)',headers:[{key:'X-Content-Type-Options',value:'nosniff'},{key:'Referrer-Policy',value:'same-origin'},{key:'X-Frame-Options',value:'DENY'},{key:'Permissions-Policy',value:'camera=(), microphone=(), geolocation=()'}]}]}};
 export default config;
