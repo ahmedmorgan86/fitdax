@@ -2,3 +2,4 @@
 @media(max-width:700px){.filters{grid-template-columns:1fr 1fr}.filters label:first-child{grid-column:1/-1}.discover .exercise-grid{grid-template-columns:1fr}.exercise-photos img{height:160px}.movement-photo{height:230px}.discover-tabs{position:sticky;top:0;background:var(--bg);z-index:2}.discover header{gap:16px}.discover main{padding:16px}.discover .intro{margin-top:20px}nav .resources-link{padding:7px 2px;font-size:9px;text-align:center}.discover .three{grid-template-columns:1fr}}
 
 .discover-tabs{flex-direction:row}#detail textarea{font:inherit;width:100%;background:var(--bg);color:var(--text);border:1px solid var(--edge);border-radius:10px;padding:12px}#detail label{display:block;margin:12px 0}#detail{overflow-wrap:anywhere}
+@media(max-width:500px){.exercise-photos{grid-template-columns:1fr}.exercise-photos img{height:220px}}
