@@ -11,3 +11,5 @@ textarea{display:block;width:100%;background:#0a1214;color:#eef6f2;border:1px so
 body,button,input,select,textarea,option{font-family:Cairo,system-ui,sans-serif}button,input,select,textarea{font:inherit}
 
 .auth-page{max-width:640px}.google-button{background:#fff;color:#202124;display:flex;justify-content:center;align-items:center;gap:12px;min-height:50px;margin:28px 0 12px}.google-button span:first-child{font-weight:800;font-size:22px}.auth-page #message{line-height:1.9}.auth-page .logo{display:flex;align-items:center;gap:10px}
+
+.approved-brand{display:block;width:100%;height:auto;border-radius:18px;margin:24px auto 0}.brand-description{text-align:center;color:var(--muted);font-size:12px}.logo{letter-spacing:-.5px}:root{--lime:#aaff32}
