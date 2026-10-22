@@ -12,7 +12,7 @@ Beneficiary supplied by owner: Ahmed Nader Morgan. Owner confirmed Egyptian wall
 
 Never approve an order solely because a user entered a reference. Match the actual receipt in the owner's wallet/bank app against order destination, amount, currency, time and reference. Pending/rejected requests do not activate access. Approval is admin-only, audited and cannot extend the same request twice. No automatic bank reconciliation or recurring debit exists. Database tests use synthetic records rolled back at completion; no real money was sent.
 
-Paid plan availability remains closed until the owner completes a genuine end-to-end collection check and approves a concrete refund/financial retention policy. Do not publish a Premium purchase flow until its advertised service exists. Changing payment settings is admin-only and uses revision conflict checks.
+On 23 October 2026 the owner requested functional subscription buttons. Pro and Premium were opened for manual transfer orders after linking the 5/9/12 cumulative program entitlements. No actual bank transfer or qualified legal review was performed. Visa/Paymob remains disabled pending merchant onboarding and end-to-end gateway testing. Refund/retention terms and provider settlement must still be reviewed by the operator. Changing payment settings is admin-only and uses revision conflict checks.
 
 ## Restore and incident procedure
 1. Identify the affected deployment, time window and type of data without copying health payloads into support logs.
