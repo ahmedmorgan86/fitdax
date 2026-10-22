@@ -1,4 +1,4 @@
-const VERSION='fitdax-training-v1',PREFIX='fitdax-training-';
+const VERSION='fitdax-training-v2',PREFIX='fitdax-training-';
 const FILES=['training.html','training.js','training.css','style.css','rest-timer.mjs','training-engine.mjs','training-methods.mjs','exercise-index.mjs','core.mjs','egyptian-meals.mjs','visuals.mjs','exercise-media.mjs','offline.mjs','resource-settings.mjs','copyright.js','fitdax-symbol.svg','fonts/Cairo-variable.ttf','data/exercise-library.json','data/exercise-library.ar.json',...['kettlebell-halo','kettlebell-halo-extension','kettlebell-triceps-extension','chair-squat','wall-pushup','bird-dog','marching'].map(n=>'media/generated/'+n+'.png')];
 const allowed=new Set(FILES.map(p=>new URL(p,self.registration.scope).pathname));
 self.addEventListener('install',event=>event.waitUntil((async()=>{const cache=await caches.open(VERSION);await cache.addAll(FILES.map(p=>new Request(new URL(p,self.registration.scope),{cache:'reload'})));await self.skipWaiting()})()));

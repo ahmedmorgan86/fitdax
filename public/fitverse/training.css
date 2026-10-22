@@ -7,3 +7,8 @@
 .training-shell{padding-bottom:130px}.timer{position:fixed;bottom:12px;inset-inline:16px;max-width:1100px;margin-inline:auto;z-index:4;padding:12px 20px;box-shadow:0 8px 45px #0009}.timer summary{list-style:none;color:var(--text);font-weight:800}.timer summary::after{content:"⌃";color:var(--lime)}.timer[open] summary{margin-bottom:12px}.timer[open] summary::after{content:"⌄"}.timer output{font-size:27px}.logging-help{margin-block:12px}body:has(.timer[open]) .training-shell{padding-bottom:300px}
 
 .timer output{pointer-events:none}
+/* Keep the timer reachable above Android/iOS system insets and small keyboards. */
+.timer{bottom:calc(12px + env(safe-area-inset-bottom));max-height:min(60dvh,420px);overflow-y:auto;overscroll-behavior:contain}
+.training-shell{padding-bottom:calc(150px + env(safe-area-inset-bottom))}
+body:has(.timer[open]) .training-shell{padding-bottom:calc(min(60dvh,420px) + 40px + env(safe-area-inset-bottom))}
+@media(max-width:420px){.training-shell .form-grid{grid-template-columns:minmax(0,1fr)}.history-entry{flex-wrap:wrap}.timer{inset-inline:10px;padding:12px}.timer .row{gap:8px}}
