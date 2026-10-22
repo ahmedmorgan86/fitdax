@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.ahmedmorgan.fitdax",
+      "sha256_cert_fingerprints": [
+        "7F:F7:F2:E5:A2:EF:4A:E0:05:2C:76:A9:B7:0C:FA:56:F8:53:B8:9E:19:F4:25:1C:88:6C:DC:31:65:54:92:E1"
+      ]
+    }
+  }
+]

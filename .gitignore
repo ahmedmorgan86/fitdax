@@ -6,3 +6,7 @@ node_modules/
 *.log
 coverage/
 supabase/.temp/
+android/.signing/
+android/.gradle/
+android/local.properties
+android/**/build/

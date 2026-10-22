@@ -1,0 +1,47 @@
+{
+  "id": "/",
+  "name": "FitDax",
+  "short_name": "FitDax",
+  "description": "تدريب وتغذية ومتابعة تقدمك — Training, nutrition and progress",
+  "lang": "ar",
+  "dir": "auto",
+  "start_url": "/fitverse/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#070c0c",
+  "theme_color": "#070c0c",
+  "categories": [
+    "health",
+    "fitness"
+  ],
+  "icons": [
+    {
+      "src": "/brand/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/brand/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/brand/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "التدريب / Training",
+      "url": "/fitverse/training.html"
+    },
+    {
+      "name": "التطبيق / Dashboard",
+      "url": "/fitverse/index.html"
+    }
+  ]
+}

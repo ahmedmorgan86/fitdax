@@ -21,11 +21,13 @@ do $$begin
  if public.fitverse_delete_account(1) then raise exception 'cross_user_delete';end if;
 end$$;
 select set_config('request.jwt.claims','{"sub":"10000000-0000-4000-8000-000000000003","role":"authenticated"}',true);
-do $$begin
+do $$declare catalog_version bigint; audit_count bigint;begin
  if (public.fitverse_access()->>'role')<>'admin' or not (public.fitverse_access()->>'full')::boolean then raise exception 'admin_missing';end if;
  if (select count(*) from public.fitverse_accounts)<>0 then raise exception 'admin_health_read_leak';end if;
- if public.fitverse_save_catalog(0,'{"brand":"Synthetic test"}')<>1 then raise exception 'admin_write_failed';end if;
- if (select count(*) from public.fitverse_audit)<>1 then raise exception 'audit_missing';end if;
+ select coalesce(max(revision),0) into catalog_version from public.fitverse_catalog;
+ select count(*) into audit_count from public.fitverse_audit;
+ if public.fitverse_save_catalog(catalog_version,'{"brand":"Synthetic test"}')<>catalog_version+1 then raise exception 'admin_write_failed';end if;
+ if (select count(*) from public.fitverse_audit)<>audit_count+1 then raise exception 'audit_missing';end if;
  insert into public.fitverse_memberships(user_id,plan,status,expires_at) values('10000000-0000-4000-8000-000000000001','pro','active',now()+interval '1 day');
 end$$;
 select set_config('request.jwt.claims','{"sub":"10000000-0000-4000-8000-000000000001","role":"authenticated"}',true);
