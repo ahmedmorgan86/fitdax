@@ -1,0 +1,13 @@
+{
+  "name": "FitDax",
+  "version": "1.0.0",
+  "package": "com.ahmedmorgan.fitdax",
+  "minAndroid": "7.0",
+  "minSdk": 24,
+  "targetSdk": 36,
+  "apk": "/downloads/fitdax-1.0.0.apk",
+  "sha256": "933109ec9d717feb40e2b7fe921b2085651a2bc8c3bba4e97b629d249bff68ff",
+  "distribution": "Direct APK; not published on Google Play",
+  "physicalDeviceTesting": "Pending",
+  "date": "2026-10-22"
+}
