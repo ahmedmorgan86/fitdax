@@ -6,3 +6,5 @@
 .exercise-photos.generated-pair{grid-template-columns:1fr}.generated-pair img{height:auto;max-height:500px}details.sources{margin-top:30px}details.sources summary{cursor:pointer}
 
 #modal .exercise-photo img{height:auto;max-height:480px}
+
+#detail .generated-pair img{max-height:48vh;object-fit:contain;background:#fff}

@@ -1,3 +1,4 @@
+import {egyptianMeals} from './egyptian-meals.mjs';
 export const exercises = [
  ['squat','سكوات إلى كرسي','Chair squat','home','legs','قف أمام كرسي ثابت، ادفع الوركين للخلف ثم قف ببطء. حافظ على ثبات الركبتين.','Use a stable chair. Sit back slowly, then stand. Keep knees steady.'],
  ['wall','ضغط الحائط','Wall push-up','home','upper','ضع اليدين على الحائط، اثن المرفقين ببطء ثم ادفع.','Place hands on a wall. Bend elbows slowly, then push away.'],
@@ -11,6 +12,7 @@ export const exercises = [
  ['pulldown','سحب علوي','Lat pulldown','gym','upper','اسحب أمام الجسم إلى أعلى الصدر ببطء. لا تسحب خلف الرقبة.','Pull slowly in front of your body to the upper chest, never behind your neck.']
 ].map(([id,ar,en,place,group,arCue,enCue])=>({id,ar,en,place,group,arCue,enCue,media:{image:null,video:null,creator:null,license:null,licenseUrl:null,sourceUrl:null,reviewed:false}}));
 export const food = [
+ ...egyptianMeals,
  {id:'oats',ar:'شوفان وموز وبذور',en:'Oats, banana & seeds',k:420,p:13,c:66,f:12,allergens:['gluten'],vegan:true,ingredientsAr:'60 جم شوفان، موزة، 15 جم بذور، ماء',ingredientsEn:'60 g oats, banana, 15 g seeds, water'},
  {id:'eggs',ar:'بيض وخبز وخضار',en:'Eggs, toast & vegetables',k:390,p:24,c:38,f:16,allergens:['egg','gluten'],vegan:false,ingredientsAr:'بيضتان، شريحتا خبز، خضار',ingredientsEn:'2 eggs, 2 slices bread, vegetables'},
  {id:'chicken',ar:'دجاج وأرز وسلطة',en:'Chicken, rice & salad',k:620,p:45,c:72,f:17,allergens:[],vegan:false,ingredientsAr:'150 جم دجاج مطهو، 200 جم أرز مطهو، سلطة، زيت زيتون',ingredientsEn:'150 g cooked chicken, 200 g cooked rice, salad, olive oil'},

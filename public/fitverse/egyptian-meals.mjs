@@ -1,0 +1,93 @@
+// FitDax recipes; ingredient references and weighed portions are in data/egyptian-food-reference.json.
+export const egyptianMeals=[
+  {
+    "id": "egypt-foul",
+    "ar": "فول وعيش بلدي",
+    "en": "Foul & baladi bread",
+    "k": 439.4,
+    "p": 22,
+    "c": 76.6,
+    "f": 7,
+    "allergens": [
+      "gluten"
+    ],
+    "vegan": true,
+    "ingredientsAr": "200 جم فول مسلوق مصفّى، 60 جم عيش بلدي، 100 جم طماطم، 5 جم زيت زيتون. دون طحينة.",
+    "ingredientsEn": "200 g drained boiled fava beans, 60 g baladi bread, 100 g tomato, 5 g olive oil. No tahini."
+  },
+  {
+    "id": "egypt-eggs",
+    "ar": "بيض وعيش بلدي",
+    "en": "Eggs & baladi bread",
+    "k": 339.2,
+    "p": 19.8,
+    "c": 40.5,
+    "f": 11.9,
+    "allergens": [
+      "egg",
+      "gluten"
+    ],
+    "vegan": false,
+    "ingredientsAr": "100 جم بيض مسلوق دون القشر (نحو بيضتين)، 60 جم عيش بلدي، 150 جم طماطم. دون زيت إضافي.",
+    "ingredientsEn": "100 g peeled boiled eggs (about 2), 60 g baladi bread, 150 g tomato. No added oil."
+  },
+  {
+    "id": "egypt-koshary",
+    "ar": "كشري منزلي بحصة محددة",
+    "en": "Portioned homemade koshary",
+    "k": 522.8,
+    "p": 21.8,
+    "c": 92.6,
+    "f": 7.9,
+    "allergens": [
+      "gluten"
+    ],
+    "vegan": true,
+    "ingredientsAr": "أوزان بعد السلق: 100 جم أرز، 100 جم عدس، 70 جم مكرونة، 50 جم حمص، 50 جم بصل مطهو. أضف 100 جم طماطم موزونة قبل التسوية و5 جم زيت. دون بصل مقلي أو زيت إضافي.",
+    "ingredientsEn": "Cooked weights: 100 g rice, 100 g lentils, 70 g pasta, 50 g chickpeas, 50 g cooked onion. Add 100 g tomato weighed before cooking and 5 g oil. No fried onions or extra oil."
+  },
+  {
+    "id": "egypt-lentil-soup",
+    "ar": "شوربة عدس وخبز",
+    "en": "Lentil soup & bread",
+    "k": 421,
+    "p": 23.5,
+    "c": 71.6,
+    "f": 6.7,
+    "allergens": [
+      "gluten"
+    ],
+    "vegan": true,
+    "ingredientsAr": "200 جم عدس مسلوق، 50 جم بصل مطهو، 100 جم طماطم موزونة قبل التسوية، 5 جم زيت، 200 مل ماء، 40 جم عيش بلدي. اخلط وسخّن حتى تمام التسوية؛ الماء بلا سعرات.",
+    "ingredientsEn": "200 g boiled lentils, 50 g cooked onion, 100 g tomato weighed before cooking, 5 g oil, 200 ml water, 40 g baladi bread. Blend and heat until cooked; water adds no calories."
+  },
+  {
+    "id": "egypt-chicken-rice",
+    "ar": "دجاج وأرز مصري",
+    "en": "Chicken & Egyptian-style rice",
+    "k": 513.7,
+    "p": 51.9,
+    "c": 48.1,
+    "f": 11.1,
+    "allergens": [],
+    "vegan": false,
+    "ingredientsAr": "150 جم صدر دجاج مطهو دون جلد، 150 جم أرز أبيض مطهو، 150 جم طماطم، 5 جم زيت. لا تشمل القيم سمنًا أو صوصًا إضافيًا.",
+    "ingredientsEn": "150 g cooked skinless chicken breast, 150 g cooked white rice, 150 g tomato, 5 g oil. Values exclude extra ghee or sauces."
+  },
+  {
+    "id": "egypt-cheese",
+    "ar": "جبنة قليلة الدسم وعيش بلدي",
+    "en": "Low-fat cheese & baladi bread",
+    "k": 336.4,
+    "p": 25.8,
+    "c": 43.5,
+    "f": 7.9,
+    "allergens": [
+      "milk",
+      "gluten"
+    ],
+    "vegan": false,
+    "ingredientsAr": "150 جم جبن أبيض قليل الدسم، 60 جم عيش بلدي، 150 جم طماطم، 5 جم زيت. قيم الجبن والخبز تختلف حسب المنتج؛ راجع العبوة.",
+    "ingredientsEn": "150 g low-fat fresh cheese, 60 g baladi bread, 150 g tomato, 5 g oil. Cheese and bread vary by product; check the label."
+  }
+];

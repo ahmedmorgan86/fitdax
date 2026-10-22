@@ -1,0 +1,280 @@
+{
+  "source": "https://fdc.nal.usda.gov/download-datasets/",
+  "dataset": "USDA SR Legacy April 2018",
+  "downloaded": "2026-10-22",
+  "note": "Ingredient estimates, not laboratory-tested Egyptian recipes. Pita and cottage cheese are explicitly approximate substitutes for local bread and cheese.",
+  "foods": [
+    {
+      "id": 168878,
+      "description": "Rice, white, long-grain, regular, enriched, cooked",
+      "per100g": {
+        "k": 130,
+        "p": 2.69,
+        "c": 28.2,
+        "f": 0.28
+      }
+    },
+    {
+      "id": 169737,
+      "description": "Pasta, cooked, enriched, without added salt",
+      "per100g": {
+        "k": 158,
+        "p": 5.8,
+        "c": 30.9,
+        "f": 0.93
+      }
+    },
+    {
+      "id": 170001,
+      "description": "Onions, cooked, boiled, drained, without salt",
+      "per100g": {
+        "k": 44,
+        "p": 1.36,
+        "c": 10.2,
+        "f": 0.19
+      }
+    },
+    {
+      "id": 170457,
+      "description": "Tomatoes, red, ripe, raw, year round average",
+      "per100g": {
+        "k": 18,
+        "p": 0.88,
+        "c": 3.89,
+        "f": 0.2
+      }
+    },
+    {
+      "id": 171413,
+      "description": "Oil, olive, salad or cooking",
+      "per100g": {
+        "k": 884,
+        "p": 0,
+        "c": 0,
+        "f": 100
+      }
+    },
+    {
+      "id": 171477,
+      "description": "Chicken, broilers or fryers, breast, meat only, cooked, roasted",
+      "per100g": {
+        "k": 165,
+        "p": 31,
+        "c": 0,
+        "f": 3.57
+      }
+    },
+    {
+      "id": 172421,
+      "description": "Lentils, mature seeds, cooked, boiled, without salt",
+      "per100g": {
+        "k": 116,
+        "p": 9.02,
+        "c": 20.1,
+        "f": 0.38
+      }
+    },
+    {
+      "id": 173417,
+      "description": "Cheese, cottage, lowfat, 1% milkfat",
+      "per100g": {
+        "k": 72,
+        "p": 12.4,
+        "c": 2.72,
+        "f": 1.02
+      }
+    },
+    {
+      "id": 173424,
+      "description": "Egg, whole, cooked, hard-boiled",
+      "per100g": {
+        "k": 155,
+        "p": 12.6,
+        "c": 1.12,
+        "f": 10.6
+      }
+    },
+    {
+      "id": 173753,
+      "description": "Broadbeans (fava beans), mature seeds, cooked, boiled, without salt",
+      "per100g": {
+        "k": 110,
+        "p": 7.6,
+        "c": 19.6,
+        "f": 0.4
+      }
+    },
+    {
+      "id": 173757,
+      "description": "Chickpeas (garbanzo beans, bengal gram), mature seeds, cooked, boiled, without salt",
+      "per100g": {
+        "k": 164,
+        "p": 8.86,
+        "c": 27.4,
+        "f": 2.59
+      }
+    },
+    {
+      "id": 174916,
+      "description": "Bread, pita, whole-wheat",
+      "per100g": {
+        "k": 262,
+        "p": 9.8,
+        "c": 55.9,
+        "f": 1.71
+      }
+    }
+  ],
+  "recipes": [
+    {
+      "id": "egypt-foul",
+      "ar": "فول وعيش بلدي",
+      "en": "Foul & baladi bread",
+      "ingredients": [
+        {
+          "fdcId": 173753,
+          "grams": 200
+        },
+        {
+          "fdcId": 174916,
+          "grams": 60
+        },
+        {
+          "fdcId": 170457,
+          "grams": 100
+        },
+        {
+          "fdcId": 171413,
+          "grams": 5
+        }
+      ]
+    },
+    {
+      "id": "egypt-eggs",
+      "ar": "بيض وعيش بلدي",
+      "en": "Eggs & baladi bread",
+      "ingredients": [
+        {
+          "fdcId": 173424,
+          "grams": 100
+        },
+        {
+          "fdcId": 174916,
+          "grams": 60
+        },
+        {
+          "fdcId": 170457,
+          "grams": 150
+        }
+      ]
+    },
+    {
+      "id": "egypt-koshary",
+      "ar": "كشري منزلي بحصة محددة",
+      "en": "Portioned homemade koshary",
+      "ingredients": [
+        {
+          "fdcId": 168878,
+          "grams": 100
+        },
+        {
+          "fdcId": 172421,
+          "grams": 100
+        },
+        {
+          "fdcId": 169737,
+          "grams": 70
+        },
+        {
+          "fdcId": 173757,
+          "grams": 50
+        },
+        {
+          "fdcId": 170001,
+          "grams": 50
+        },
+        {
+          "fdcId": 170457,
+          "grams": 100
+        },
+        {
+          "fdcId": 171413,
+          "grams": 5
+        }
+      ]
+    },
+    {
+      "id": "egypt-lentil-soup",
+      "ar": "شوربة عدس وخبز",
+      "en": "Lentil soup & bread",
+      "ingredients": [
+        {
+          "fdcId": 172421,
+          "grams": 200
+        },
+        {
+          "fdcId": 170001,
+          "grams": 50
+        },
+        {
+          "fdcId": 170457,
+          "grams": 100
+        },
+        {
+          "fdcId": 171413,
+          "grams": 5
+        },
+        {
+          "fdcId": 174916,
+          "grams": 40
+        }
+      ]
+    },
+    {
+      "id": "egypt-chicken-rice",
+      "ar": "دجاج وأرز مصري",
+      "en": "Chicken & Egyptian-style rice",
+      "ingredients": [
+        {
+          "fdcId": 171477,
+          "grams": 150
+        },
+        {
+          "fdcId": 168878,
+          "grams": 150
+        },
+        {
+          "fdcId": 170457,
+          "grams": 150
+        },
+        {
+          "fdcId": 171413,
+          "grams": 5
+        }
+      ]
+    },
+    {
+      "id": "egypt-cheese",
+      "ar": "جبنة قليلة الدسم وعيش بلدي",
+      "en": "Low-fat cheese & baladi bread",
+      "ingredients": [
+        {
+          "fdcId": 173417,
+          "grams": 150
+        },
+        {
+          "fdcId": 174916,
+          "grams": 60
+        },
+        {
+          "fdcId": 170457,
+          "grams": 150
+        },
+        {
+          "fdcId": 171413,
+          "grams": 5
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+import {mergeSets,validateSet} from './training-engine.mjs';
+const DB='fitdax-offline-v1',STORE='vault',TTL=7*864e5;
+const encoder=new TextEncoder(),decoder=new TextDecoder();
+let opening,storageTail=Promise.resolve();
+function database(){return opening||=(new Promise((resolve,reject)=>{const r=indexedDB.open(DB,1);r.onupgradeneeded=()=>r.result.createObjectStore(STORE);r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)}))}
+async function read(key){const db=await database();return new Promise((resolve,reject)=>{const r=db.transaction(STORE).objectStore(STORE).get(key);r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)})}
+async function write(key,value){const db=await database();return new Promise((resolve,reject)=>{const t=db.transaction(STORE,'readwrite');t.objectStore(STORE).put(value,key);t.oncomplete=resolve;t.onerror=()=>reject(t.error);t.onabort=()=>reject(t.error)})}
+async function hash(value){return [...new Uint8Array(await crypto.subtle.digest('SHA-256',encoder.encode(value)))].map(x=>x.toString(16).padStart(2,'0')).join('')}
+async function encrypt(value,key,scope){const iv=crypto.getRandomValues(new Uint8Array(12)),data=await crypto.subtle.encrypt({name:'AES-GCM',iv,additionalData:encoder.encode(scope)},key,encoder.encode(JSON.stringify(value)));return {iv,data}}
+async function decrypt(value,key,scope){return JSON.parse(decoder.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:value.iv,additionalData:encoder.encode(scope)},key,value.data)))}
+async function _clearOffline(accountKey){if(accountKey){const meta=await read('active');if(meta&&meta.scope!==await hash(accountKey))return false;}const db=await database();await new Promise((resolve,reject)=>{const t=db.transaction(STORE,'readwrite');t.objectStore(STORE).delete('active');t.objectStore(STORE).delete('snapshot');t.oncomplete=resolve;t.onerror=()=>reject(t.error)});localStorage.removeItem('fitdax-offline-enabled')}
+async function active(){const meta=await read('active');if(!meta)return null;return meta}
+async function _enableOffline(snapshot,{register=true}={}){
+ if(!snapshot.accountKey||!snapshot.profile)throw Error('profile_required');
+ const scope=await hash(snapshot.accountKey),previous=await active();if(previous&&previous.scope!==scope)await _clearOffline();
+ const key=previous?.scope===scope?previous.key:await crypto.subtle.generateKey({name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+ const meta={scope,key,expires:Date.now()+TTL};await write('active',meta);const old=previous?.scope===scope?await _loadOffline({allowExpired:true}):null;
+ await write('snapshot',await encrypt({...snapshot,sets:mergeSets(snapshot.sets||[],old?.outbox||[]).filter(s=>!old?.deletions?.includes(s.id)),outbox:old?.outbox||[],deletions:old?.deletions||[],savedAt:Date.now()},key,scope));
+ localStorage.setItem('fitdax-offline-enabled','1');
+
+}
+async function _loadOffline({allowExpired=false}={}){const meta=await active();if(!meta||(meta.expires<Date.now()||meta.locked)&&!allowExpired)return null;const sealed=await read('snapshot');if(!sealed)return null;try{return await decrypt(sealed,meta.key,meta.scope)}catch{await _clearOffline();throw Error('offline_data_unavailable')}}
+async function _cacheOnline(snapshot){const meta=await active();if(!meta)return false;const scope=await hash(snapshot.accountKey);if(scope!==meta.scope)return false;await _enableOffline(snapshot,{register:false});return true}
+async function _queueSet(record,accountKey){const value=validateSet(record),meta=await active(),snapshot=await _loadOffline();if(!meta||!snapshot)throw Error('enable_offline_first');if(snapshot.accountKey!==accountKey)throw Error('account_changed');if(snapshot.outbox.length>=500&&!snapshot.outbox.some(s=>s.id===value.id))throw Error('offline_queue_full');snapshot.outbox=mergeSets(snapshot.outbox,[value]);snapshot.sets=mergeSets(snapshot.sets,[value]);await write('snapshot',await encrypt(snapshot,meta.key,meta.scope));return snapshot}
+async function _acknowledgeOffline(ids,accountKey){const meta=await active(),snapshot=await _loadOffline({allowExpired:true});if(!meta||!snapshot)return;if(snapshot.accountKey!==accountKey)throw Error('account_changed');snapshot.outbox=snapshot.outbox.filter(s=>!ids.includes(s.id));await write('snapshot',await encrypt(snapshot,meta.key,meta.scope))}
+async function _removeQueued(id,accountKey){const meta=await active(),snapshot=await _loadOffline();if(!meta||!snapshot||snapshot.accountKey!==accountKey)throw Error('account_changed');snapshot.outbox=snapshot.outbox.filter(s=>s.id!==id);snapshot.sets=snapshot.sets.filter(s=>s.id!==id);await write('snapshot',await encrypt(snapshot,meta.key,meta.scope))}
+export async function syncOffline(send,liveSnapshot,remove){const snapshot=await loadOffline({allowExpired:true});if(!snapshot)return {accepted:[],deleted:[]};if(snapshot.accountKey!==liveSnapshot.accountKey){await clearOffline(snapshot.accountKey);throw Error('account_changed')}const accepted=[],deleted=[];for(let i=0;i<snapshot.outbox.length;i+=20){const batch=snapshot.outbox.slice(i,i+20),reply=await send(batch);if(!Array.isArray(reply.accepted)||reply.accepted.some(id=>!batch.some(s=>s.id===id)))throw Error('invalid_sync_response');await acknowledgeOffline(reply.accepted,liveSnapshot.accountKey);accepted.push(...reply.accepted);if(reply.accepted.length!==batch.length)throw Error('partial_sync')}const latest=await loadOffline({allowExpired:true});for(let i=0;i<(latest?.deletions||[]).length;i+=20){const ids=latest.deletions.slice(i,i+20);if(!remove)throw Error('delete_sync_required');await remove(ids);await acknowledgeDeletes(ids,liveSnapshot.accountKey);deleted.push(...ids)}await cacheOnline({...liveSnapshot,sets:mergeSets(liveSnapshot.sets||[],snapshot.outbox.filter(s=>accepted.includes(s.id))).filter(s=>!deleted.includes(s.id))});return {accepted,deleted};}
+async function leaseLocked(work){
+ if(globalThis.navigator?.locks?.request)return navigator.locks.request('fitdax-private-vault',work);
+ const db=await database(),owner=crypto.randomUUID();
+ await new Promise((resolve,reject)=>{const t=db.transaction(STORE,'readwrite'),store=t.objectStore(STORE),r=store.get('lease');let busy=false;r.onsuccess=()=>{if(r.result?.until>Date.now()){busy=true;t.abort();return;}store.put({owner,until:Date.now()+60000},'lease')};t.oncomplete=resolve;t.onabort=()=>reject(Error(busy?'offline_busy':'offline_storage_failed'));t.onerror=()=>reject(t.error)});
+ try{return await work()}finally{await new Promise((resolve,reject)=>{const t=db.transaction(STORE,'readwrite'),store=t.objectStore(STORE),r=store.get('lease');r.onsuccess=()=>{if(r.result?.owner===owner)store.delete('lease')};t.oncomplete=resolve;t.onerror=()=>reject(t.error)})}
+}
+function locked(work){if(globalThis.navigator?.locks?.request)return navigator.locks.request('fitdax-private-vault',work);const task=storageTail.then(()=>leaseLocked(work));storageTail=task.catch(()=>{});return task;}
+const enabledFlag=()=>{try{return localStorage.getItem('fitdax-offline-enabled')==='1'}catch{return false}};
+export const clearOffline=key=>enabledFlag()?locked(()=>_clearOffline(key)):Promise.resolve();
+export const loadOffline=options=>enabledFlag()?locked(()=>_loadOffline(options)):Promise.resolve(null);
+export const cacheOnline=snapshot=>enabledFlag()?locked(()=>_cacheOnline(snapshot)):Promise.resolve(false);
+export const queueSet=(record,key)=>locked(()=>_queueSet(record,key));
+export const acknowledgeOffline=(ids,key)=>locked(()=>_acknowledgeOffline(ids,key));
+export const removeQueued=(id,key)=>locked(()=>_removeQueued(id,key));
+export async function enableOffline(snapshot,{register=true}={}){if(register&&!('serviceWorker' in navigator))throw Error('offline_not_supported');if(register){await navigator.serviceWorker.register('sw.js',{scope:'/fitverse/'});let timer;try{await Promise.race([navigator.serviceWorker.ready,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('offline_setup_failed')),15000)})])}finally{clearTimeout(timer)}}await locked(()=>_enableOffline(snapshot,{register:false}));}
+
+export const lockOffline=accountKey=>enabledFlag()?locked(async()=>{const meta=await active();if(!meta||accountKey&&meta.scope!==await hash(accountKey))return;await write('active',{...meta,locked:true})}):Promise.resolve();
+export const queueDelete=(id,accountKey)=>locked(async()=>{const meta=await active(),snapshot=await _loadOffline({allowExpired:true});if(!meta||!snapshot||snapshot.accountKey!==accountKey)throw Error('account_changed');if((snapshot.deletions||[]).length>=500)throw Error('offline_queue_full');snapshot.outbox=snapshot.outbox.filter(s=>s.id!==id);snapshot.deletions=[...new Set([...(snapshot.deletions||[]),id])];snapshot.sets=snapshot.sets.filter(s=>s.id!==id);await write('snapshot',await encrypt(snapshot,meta.key,meta.scope));return snapshot});
+export const acknowledgeDeletes=(ids,accountKey)=>locked(async()=>{const meta=await active(),snapshot=await _loadOffline({allowExpired:true});if(!meta||!snapshot||snapshot.accountKey!==accountKey)throw Error('account_changed');snapshot.deletions=(snapshot.deletions||[]).filter(id=>!ids.includes(id));snapshot.sets=snapshot.sets.filter(s=>!ids.includes(s.id));await write('snapshot',await encrypt(snapshot,meta.key,meta.scope))});
