@@ -4,8 +4,16 @@ def signing = signingFile.exists() ? new groovy.json.JsonSlurper().parse(signing
 android {
  namespace 'com.ahmedmorgan.fitdax'
  compileSdk 36
- defaultConfig { applicationId 'com.ahmedmorgan.fitdax'; minSdk 24; targetSdk 36; versionCode 1; versionName '1.0.0' }
+ compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+ testOptions { unitTests.includeAndroidResources = true; unitTests.all {
+  systemProperty 'robolectric.dependency.repo.url', 'https://repo.maven.apache.org/maven2'
+  if (project.hasProperty('robolectricJarDir')) {
+   systemProperty 'robolectric.offline', 'true'
+   systemProperty 'robolectric.dependency.dir', project.property('robolectricJarDir')
+  }
+ } }
+ defaultConfig { applicationId 'com.ahmedmorgan.fitdax'; minSdk 24; targetSdk 36; versionCode 2; versionName '1.0.1' }
  signingConfigs { release { if(signing) { storeFile rootProject.file('.signing/fitdax-release.jks'); storePassword signing.password; keyAlias 'fitdax'; keyPassword signing.password } } }
  buildTypes { release { signingConfig signingConfigs.release; minifyEnabled false } }
 }
-dependencies { implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.7.4' }
+dependencies { implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.7.4'; testImplementation 'junit:junit:4.13.2'; testImplementation 'org.robolectric:robolectric:4.16.1' }

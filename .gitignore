@@ -10,3 +10,5 @@ android/.signing/
 android/.gradle/
 android/local.properties
 android/**/build/
+android/.robolectric-m2/
+public/app-version.json
