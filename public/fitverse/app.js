@@ -1,3 +1,4 @@
+import {checkoutDestination} from './checkout-intent.mjs';
 import {trainingData,exportAccount,alignOffline,allowLocalPurge,clearOffline,lockOffline} from './account-tools.mjs';
 import {foundationIllustrations} from './visuals.mjs';
 import {exerciseMedia} from './exercise-media.mjs';
@@ -46,4 +47,5 @@ function paywall(){return `<div class="card"><span class="eyebrow">FITDAX PLANS<
 function basicTraining(){if(!eligible(p()))return notice();return `<h2>${t('برامجك الأساسية المجانية','Your free foundation programs')}</h2><p class="muted">${t('اختر قالبًا أساسيًا. التغذية والتحليلات المتقدمة ضمن Pro.','Choose a foundation template. Nutrition and advanced analytics are in Pro.')}</p><div class="grid three">${catalog.programs.filter(p=>p.enabled).map(program=>`<article class="card"><span class="pill">${program.paid?'Pro':'Free'}</span><h3>${esc(t(program.ar,program.en))}</h3><p>${n(program.days)} ${t('جلسات أسبوعيًا','sessions per week')}</p><button class="primary" data-program="${program.id}" ${program.paid&&!access.full?'disabled':''}>${t('اختيار البرنامج','Choose program')}</button></article>`).join('')}</div>${state.plan?`<section class="card" style="margin-top:20px"><h3>${t('الخطة الحالية','Current plan')}</h3>${state.plan.sessions.map((session,i)=>`<div class="list-row"><span class="grow">${t('الجلسة','Session')} ${i+1} · ${session.ids.length} ${t('تمارين','exercises')}</span><button data-start="${i}">${t('ابدأ الجلسة','Start session')}</button></div>`).join('')}</section>`:''}${safeNote()}`;}
 
 window.addEventListener('storage',event=>{if(event.key==='fitdax-session-ended'){state=fresh();detailedSessions=[];$('#app').textContent='';location.replace('login.html')}});
-boot();
+let pendingCheckout=null;try{pendingCheckout=checkoutDestination(sessionStorage.getItem('fitdax-checkout'));sessionStorage.removeItem('fitdax-checkout')}catch{}
+if(pendingCheckout)location.replace(pendingCheckout);else boot();

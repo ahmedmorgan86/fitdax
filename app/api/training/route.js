@@ -27,7 +27,7 @@ async function handler(request){try{
  if(request.method==='PATCH'){
   const input=await body(request,40000);if(input.accountKey!==accountKey)return response({error:'account_changed'},409);if(!Number.isSafeInteger(input.revision)||input.revision<0)return response({error:'invalid_revision'},400);
   const {data:row,error:catalogError}=await db.from('fitverse_catalog').select('data').eq('id',1).maybeSingle();if(catalogError)throw Error();
-  const catalog={...defaultCatalog(),...(row?.data||{})};const settings=validateTraining(input.settings,state.profile,{full:access.full,overrides:catalog.resources?.overrides});
+  const catalog={...defaultCatalog(),...(row?.data||{})};const settings=validateTraining(input.settings,state.profile,{full:access.full,tier:access.tier||'free',role:access.role,overrides:catalog.resources?.overrides});
   const payload=await seal(settings,process.env.FITVERSE_DATA_KEY,trainingKey(user.id));const {data:revision,error}=await db.rpc('fitdax_save_training',{p_revision:input.revision,p_payload:payload});
   if(error)return rpcError(error);return response({settings,revision});
  }

@@ -10,7 +10,7 @@
     "dev": "next dev --hostname 127.0.0.1",
     "build": "npm run test && next build",
     "start": "next start --hostname 127.0.0.1",
-    "test": "node tests.mjs && node security-tests.mjs && node payment-tests.mjs && node auth-tests.mjs && node resource-tests.mjs && node training-tests.mjs && node offline-tests.mjs && node release-tests.mjs && node seo-tests.mjs"
+    "test": "node tests.mjs && node security-tests.mjs && node payment-tests.mjs && node auth-tests.mjs && node resource-tests.mjs && node training-tests.mjs && node offline-tests.mjs && node release-tests.mjs && node seo-tests.mjs && node membership-tests.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",

@@ -1,3 +1,4 @@
+import {hasProgramAccess} from './memberships.mjs';
 import {exerciseIndex} from './exercise-index.mjs';
 import {eligible} from './core.mjs';
 
@@ -55,13 +56,13 @@ export function alternatives(id,equipment,level='beginner'){
  return family.filter(other=>other!==id&&Object.hasOwn(exerciseIndex,other)).map(other=>exerciseIndex[other]).filter(e=>requiredEquipment(e.id).every(item=>equipment.includes(item))&&levels[e.level]<=levels[level]).sort((a,b)=>levels[a.level]-levels[b.level]||a.name.localeCompare(b.name));
 }
 export function initialTraining(){return {version:1,programId:null,experience:'beginner',weekDays:[],equipment:['body only'],substitutions:{}}}
-export function validateTraining(v,profile,{full=false,overrides={}}={}){
+export function validateTraining(v,profile,{full=false,tier=full?'premium':'free',role='member',overrides={}}={}){
  if(!object(v)||v.version!==1||!Object.hasOwn(levels,v.experience)||!Array.isArray(v.equipment)||v.equipment.length>equipmentOptions.length||!v.equipment.every(e=>equipmentOptions.includes(e))||!object(v.substitutions))invalid('invalid_training');
  const out={version:1,programId:v.programId,experience:v.experience,weekDays:[],equipment:[...new Set(v.equipment)],substitutions:{}};
  if(v.programId===null)return {...out,substitutions:{}};
  const p=trainingPrograms.find(p=>p.id===v.programId);if(!p||overrides['train-'+p.id]?.enabled===false)invalid('program_unavailable');
  if(!eligible(profile))invalid('training_needs_review');
- if(p.paid&&!full)invalid('upgrade_required');
+ if(!hasProgramAccess(p.id,{tier,role}))invalid('upgrade_required');
  if(levels[v.experience]<levels[p.level])invalid('experience_required');
  if(!Array.isArray(v.weekDays)||v.weekDays.length!==p.sessions.length||new Set(v.weekDays).size!==v.weekDays.length||!v.weekDays.every(d=>Number.isInteger(d)&&d>=0&&d<=6))invalid('invalid_schedule');
  out.weekDays=[...v.weekDays];
