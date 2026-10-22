@@ -6,7 +6,7 @@ import {normalizeWallet,validatePayments,defaultPayments} from './lib/payments.m
 const db=JSON.parse(fs.readFileSync('public/fitverse/data/exercise-library.json','utf8'));
 assert.equal(db.entries.length,876);assert.equal(db.entries.reduce((n,e)=>n+e.images.length,0),1746);
 assert.match(db.commit,/^[a-f0-9]{40}$/);assert.ok(db.imageBase.includes(db.commit));
-assert.equal(new Set(db.entries.map(e=>e.id)).size,876);assert.equal(db.entries.filter(e=>e.images.length).length,873);assert.equal(db.entries.filter(e=>!e.instructions.length).length,5);
+assert.equal(new Set(db.entries.map(e=>e.id)).size,876);assert.equal(db.entries.filter(e=>e.images.length).length,873);assert.equal(db.entries.filter(e=>!e.instructions.length).length,0);
 for(const e of db.entries){assert.ok(Array.isArray(e.instructions));assert.ok(Array.isArray(e.images));for(const p of e.images)assert.match(p,/^[A-Za-z0-9_.()-]+\/[01]\.jpg$/)}
 for(const g of trainingGuides)for(const id of g.ids)assert.ok(db.entries.some(e=>e.id===id),id);
 for(const g of nutritionGuides)for(const day of g.days)for(const meal of day)assert.ok(mealTranslations[meal],meal);
@@ -17,3 +17,5 @@ assert.throws(()=>validateResources({...defaultResources(),overrides:{'https://b
 for(const v of ['+20 109 790 5455','00201097905455','٠١٠٩٧٩٠٥٤٥٥','۰۱۰۹۷۹۰۵۴۵۵'])assert.equal(normalizeWallet(v),'01097905455');
 assert.throws(()=>validatePayments({...defaultPayments(),walletEnabled:true}),/recipient_required/);
 console.log('PASS 876 entries / 1746 pinned image paths, guide references, bilingual meals, all 128 screening cases, content validation and Egyptian wallet forms');
+
+const ar=JSON.parse(fs.readFileSync('public/fitverse/data/exercise-library.ar.json','utf8'));for(const e of db.entries){assert.equal(ar.entries[e.id].steps.length,e.instructions.length,e.id);assert.ok(ar.entries[e.id].steps.every(s=>/[\u0600-\u06ff]/.test(s)),e.id)}console.log('PASS all 876 exercises have matching Arabic/English steps');
