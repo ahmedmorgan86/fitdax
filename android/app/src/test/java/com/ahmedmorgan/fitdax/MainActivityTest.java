@@ -1,21 +1,22 @@
 package com.ahmedmorgan.fitdax;
 import android.os.Bundle;
+import android.os.Looper;
 import android.view.ViewGroup;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Button;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import static org.junit.Assert.*;
+import static org.robolectric.Shadows.shadowOf;
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk=34)
 public class MainActivityTest {
  @Test public void coldStartWithoutBrowserShowsRecoveryInsteadOfCrashing(){
   try(var c=Robolectric.buildActivity(MainActivity.class).setup()){
-   MainActivity a=c.get();assertFalse(a.isFinishing());
+   MainActivity a=c.get();shadowOf(Looper.getMainLooper()).idle();assertFalse(a.isFinishing());
    assertTrue(text((ViewGroup)a.findViewById(android.R.id.content)).contains(a.getString(R.string.browser_missing)));
   }
  }
