@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import vm from 'node:vm';
+import {hasProgramAccess} from './public/fitverse/memberships.mjs';
 import {quickWorkout,weeklySummary,shoppingList,availableRecipes} from './public/fitverse/daily-tools.mjs';
 import {toolsView} from './public/fitverse/daily-tools-ui.mjs';
 import {egyptianMeals} from './public/fitverse/egyptian-meals.mjs';
@@ -27,3 +29,11 @@ assert.equal(availableRecipes([]).length,0);
 const edited=structuredClone(egyptianMeals);edited[0].ingredientsAr='وصفة معدّلة';assert(!availableRecipes(edited).some(m=>m.id===edited[0].id));
 for(const language of ['ar','en']){const t=(ar,en)=>language==='ar'?ar:en;const html=toolsView({live:{sets:[],profile:{...profile,diet:'vegan'},settings,nextCursor:null},t,today,gearAr:{},catalogFoods:egyptianMeals});assert(html.includes('quick-form'));assert(html.includes('shopping-form'));assert(!html.includes('name="egypt-eggs"'));assert(html.includes(language==='ar'?'تقرير آخر 7 أيام':'Last 7 days'));}
 console.log('PASS time/equipment/plan/disabled-content/pain gates, weekly date boundaries and actual logs, exact combined ingredient weights and allergy/vegan restrictions.');
+// Run the actual view selection function against a saved Premium plan after downgrade.
+const trainingSource=fs.readFileSync('public/fitverse/training.js','utf8');
+const selection=trainingSource.slice(trainingSource.indexOf('function activeSessions()'),trainingSource.indexOf('function workout()'));
+for(const [tier,role,expected] of [['free','member',0],['pro','member',0],['premium','member',1],['free','admin',1]]){
+ const context={quickSession:null,live:{settings:{programId:'ppl-six'},profile,access:{tier,role,full:true}},trainingPrograms,hasProgramAccess,eligible:()=>true,over:()=>({enabled:true}),plannedSessions:()=>['session']};
+ assert.equal(vm.runInNewContext(selection+';activeSessions().length',context),expected);
+}
+console.log('PASS saved Premium workout view closes after Free/Pro downgrade and preserves current Premium/admin access.');
