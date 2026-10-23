@@ -3,7 +3,7 @@ import {trainingData,exportAccount,alignOffline,allowLocalPurge,clearOffline,loc
 import {foundationIllustrations} from './visuals.mjs';
 import {exerciseMedia} from './exercise-media.mjs';
 import {exercises,food,eligible,calories,makePlan,mealPlan,validateProfile,dateKey,fresh} from './core.mjs';
-const $=s=>document.querySelector(s);let lang=localStorage.getItem('fv-lang')||'ar',page='home',filter='all',query='',mealMode='weekly',mealDay=0,step=0,draft={},sessionIndex=null,sessionDone=new Set();
+const $=s=>document.querySelector(s);let lang=localStorage.getItem('fv-lang')||'ar',page=new URLSearchParams(location.search).get('view')==='progress'?'progress':'home',filter='all',query='',mealMode='weekly',mealDay=0,step=0,draft={},sessionIndex=null,sessionDone=new Set();
 let detailedSessions=[],accountKey=null;
 let access={role:'member',tier:'free',full:false},catalog=null;let state=fresh(),cloud={revision:0,pending:0,error:null,ready:false},saveTail=Promise.resolve();
 const t=(ar,en)=>lang==='ar'?ar:en,esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
